@@ -4,8 +4,8 @@
   "description": "",
   "main": "handler.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "deploy": "sls deploy"
+    "test": "echo \"Error: no test specified\" && exit 0",
+    "deploy": "serverless deploy --stage ${STAGE:=dev}"
   },
   "repository": {
     "type": "git",
