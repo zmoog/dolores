@@ -16,6 +16,8 @@ Candidate tools:
 * CloudFormation
 * SAM
 
+But... I'm not sure if define the pipeline as code is good choice for this small scale project. I will describe the setup of the pipeline and build stage in the `docs/aws-codepipeline.md` to keep it simple.
+
 #### Setup a pipeline step by step
 
 * https://serverless.com/blog/cicd-for-serverless-part-2/
