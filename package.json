@@ -5,7 +5,8 @@
   "main": "handler.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 0",
-    "deploy": "serverless deploy --stage ${STAGE:=dev}"
+    "deploy": "serverless deploy --stage ${STAGE:=dev}",
+    "remove": "serverless remove --stage ${STAGE:=dev}"
   },
   "repository": {
     "type": "git",
