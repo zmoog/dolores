@@ -1,6 +1,6 @@
 # Dolores Diaries
 
-These are the Dolores Diaries, a personal log of the development of the Dolroes R2 project for personal use.
+These are the Dolores Diaries, a personal log of the development of the Dolroes R2 project for personale use.
 
 ## March, 19th 2019
 
