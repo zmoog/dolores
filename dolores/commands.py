@@ -27,10 +27,10 @@ async def iphones(ctx, name: str = '13 Pro Max'):
 			return
 
 		all_iphones = json.loads(r.text)
-		filtered_iphones = list(filter(lambda x: name in x['name'], all_iphones))
 
+		filtered_iphones = list(filter(lambda x: name in x['name'], all_iphones))
 		if len(filtered_iphones) == 0:
-			await ctx.send('No iPhones found.')
+			await ctx.send(f'No iPhones found with "{name}" in the name.')
 			return
 
 		msg = f'Here are the latest iPhones {name}:\n'
