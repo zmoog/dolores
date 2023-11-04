@@ -40,7 +40,7 @@ class TrelloCog(commands.Cog):
     # Periodic tasks
     #
 
-    @tasks.loop(time=[dt.time(hour=5, minute=41, tzinfo=utc)])
+    @tasks.loop(time=[dt.time(hour=7, minute=45, tzinfo=utc)])
     async def remind_due_cards(self):
         """Remind about due cards."""
 
