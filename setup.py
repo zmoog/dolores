@@ -33,9 +33,11 @@ setup(
     """,
     install_requires=[
         "click",
+        "httpx",
+        "humanize",
+        "Jinja2",
         "pydantic",
         "python-dotenv",
-        "httpx",
         "rich",
         ],
     extras_require={
