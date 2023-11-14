@@ -32,10 +32,12 @@ class TrelloCog(commands.Cog):
             api_token=os.environ["TRELLO_TOKEN"],
         )
 
+        self.remind_inflight_cards.start()
         self.remind_due_cards.start()
         print("TrelloCog has been loaded!")
 
     def cog_unload(self):
+        self.remind_inflight_cards.cancel()
         self.remind_due_cards.cancel()
         print("TrelloCog has been unloaded!")
 
@@ -43,7 +45,25 @@ class TrelloCog(commands.Cog):
     # Periodic tasks
     #
 
-    @tasks.loop(time=[dt.time(hour=7, minute=45, tzinfo=utc)])
+    @tasks.loop(time=[dt.time(hour=6, minute=0, tzinfo=utc)])
+    async def remind_inflight_cards(self):
+        """Remind me about in-flight cards."""
+        destinations = [
+            ("maintenance", "in_progress"),
+            ("professional", "in_progress"),
+            ("elastic", "in_progress"),
+        ]
+
+        for board_name, list_name in destinations:
+            print(f"reminding about {board_name} {list_name}")
+            # Lookup Trello list info.
+            cfg = self._find_list_info(board_name, list_name)
+
+            channel = self.bot.get_channel(cfg["channel_id"])
+
+            await self._post_cards(channel, board_name, list_name)
+
+    @tasks.loop(time=[dt.time(hour=6, minute=0, tzinfo=utc)])
     async def remind_due_cards(self):
         """Remind about due cards."""
 
@@ -104,6 +124,30 @@ class TrelloCog(commands.Cog):
             raise ConfigError(f"List {list_name} not found.")
 
         return cfg[list_name]
+
+    async def _post_cards(
+        self,
+        destination,
+        board_name: str,
+        list_name: str = "in_progress",
+        label: str = None,
+    ):
+        try:
+            # Lookup Trello list info.
+            cfg = self._find_list_info(board_name, list_name)
+
+            cards = self.cards.list(cfg["list_id"], label=label)
+            print(f"found {len(cards)} cards")
+
+            msg = render_cards(card_list_template, cards=cards)
+
+            await destination.send(msg[:2000])
+
+        except ConfigError as e:
+            await destination.send("Cant find that board or list.")
+        except Exception as e:
+            print(e)
+            await destination.send("Something went wrong.")
 
     async def _post_due_cards(
         self,
