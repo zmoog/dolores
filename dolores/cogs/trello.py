@@ -12,6 +12,9 @@ from trellokit import trello as trellokit
 
 utc = dt.timezone.utc
 
+soon = dt.timedelta(days=3)
+upcoming = dt.timedelta(days=7)
+
 
 class ConfigError(Exception):
     pass
@@ -120,8 +123,14 @@ class TrelloCog(commands.Cog):
             # Group cards by due date bucket.
             #
 
-            # Filter out cards without due dates.
-            cards_due = [card for card in cards if card.due_date]
+            now = dt.datetime.now()
+
+            # Filter out cards without due dates and cards that are not due soon.
+            cards_due = [
+                card
+                for card in cards
+                if card.due_date and now < card.due_date < now + upcoming
+            ]
 
             # Sort and group cards by due date bucket (overdue, soon, upcoming).
             groups = itertools.groupby(
@@ -166,10 +175,10 @@ def bucketize(card: trellokit.Card):
     if card.due_date < now:
         return "overdue"
 
-    if card.due_date < now + dt.timedelta(days=3):
+    if card.due_date < now + soon:
         return "soon"
 
-    if card.due_date < now + dt.timedelta(days=7):
+    if card.due_date < now + upcoming:
         return "upcoming"
 
     return "later"
@@ -183,14 +192,15 @@ environment.filters["delta_from_now"] = lambda x: dt.datetime.now() - x
 environment.filters["naturaldelta"] = humanize.naturaldelta
 
 cards_due_template = environment.from_string(
-    """Here are the cards with due dates in the list **{{ name }}**:
+    """
 {% for bucket, items in groups -%}
 - {{ bucket|title }}:
   {% for card in items -%}
   - [{{ card.name }}]({{ card.url }}) — {{ card.due_date|delta_from_now|naturaldelta }}
   {% endfor %}
+{% else %}
+✅ There are no cards with due dates in the list **{{ name }}**.
 {% endfor %}
-
 """
 )
 
